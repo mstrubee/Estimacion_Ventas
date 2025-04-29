@@ -1,164 +1,88 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evaluador de Restaurante</title>
+  <title>Evaluador de Ventas - Restaurante</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .col {
-      flex: 1;
-      min-width: 280px;
-    }
-    label, input {
-      display: block;
-      margin-bottom: 10px;
-    }
-    input[type="number"] {
+    h1 { text-align: center; color: #333; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input {
       width: 100%;
-    }
-    table {
-      margin-top: 20px;
-      width: 100%;
-      border-collapse: collapse;
-    }
-    td, th {
       padding: 8px;
-      border: 1px solid #ccc;
-      text-align: right;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background: #e6ffe6;
+      border: 1px solid #b3ffb3;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
+  <h1>Modelo de Evaluación de Ventas</h1>
+  
+  <label for="dias">Número de días operativos:</label>
+  <input type="number" id="dias" value="21">
 
-<div class="col">
-  <h2>Evaluador de Restaurante</h2>
+  <label for="comensales">Número de comensales por llenado:</label>
+  <input type="number" id="comensales" value="70">
 
-  <label>Ventas mensuales (en millones):
-    <input type="number" id="ventasBase" value="50">
-  </label>
-  <p><strong>Ventas con IVA:</strong> $<span id="ventasIVA">0</span></p>
-  <p><strong>Ventas netas:</strong> $<span id="netoMostrar">0</span></p>
+  <label for="ticket">Ticket promedio (CLP):</label>
+  <input type="number" id="ticket" value="12000">
 
-  <label>Inversión inicial (en millones):
-    <input type="number" id="inversion" value="10">
-  </label>
-  <p><strong>Inversión inicial:</strong> $<span id="inversionMonto">0</span></p>
+  <label for="llenados">Llenados totales por día:</label>
+  <input type="number" id="llenados" value="2">
 
-  <h3>Porcentajes de gasto</h3>
-  <label>Insumos y producción (%): <input type="number" id="insumos" value="38.5"></label>
-  <p>Valor: $<span id="gastoInsumos">0</span></p>
+  <div class="result" id="resultados"></div>
 
-  <label>Remuneraciones (%): <input type="number" id="remuneraciones" value="20"></label>
-  <p>Valor: $<span id="gastoRem">0</span></p>
+  <script>
+    function formatCLP(value) {
+      return value.toLocaleString('es-CL', { maximumFractionDigits: 0 });
+    }
 
-  <label>Dieta Directorio (%): <input type="number" id="dieta" value="20"></label>
-  <p>Valor: $<span id="gastoDieta">0</span></p>
+    function calcularVentas() {
+      const dias = parseInt(document.getElementById('dias').value) || 0;
+      const comensales = parseInt(document.getElementById('comensales').value) || 0;
+      const ticket = parseInt(document.getElementById('ticket').value) || 0;
+      const llenados = parseInt(document.getElementById('llenados').value) || 0;
 
-  <label>Arriendo (en millones): <input type="number" id="arriendoFijo" value="5"></label>
-  <p>Valor: $<span id="gastoArriendo">0</span> (<span id="porcArriendo">0</span>% de ventas netas)</p>
+      const comensalesDia = comensales * llenados;
+      const ventasBrutasDia = comensalesDia * ticket;
+      const ventasNetasDia = ventasBrutasDia / 1.19;
 
-  <label>Servicios (%): <input type="number" id="servicios" value="3"></label>
-  <p>Valor: $<span id="gastoServicios">0</span></p>
+      const ventasBrutasTotales = ventasBrutasDia * dias;
+      const ventasNetasTotales = ventasNetasDia * dias;
 
-  <h3>Estacionalidad mensual (%)</h3>
-  <div id="meses"></div>
-</div>
+      document.getElementById('resultados').innerHTML = `
+        <strong>Resultados:</strong><br>
+        Comensales diarios: ${formatCLP(comensalesDia)}<br>
+        Ventas diarias brutas: $${formatCLP(ventasBrutasDia)}<br>
+        Ventas diarias netas: $${formatCLP(ventasNetasDia)}<br><br>
+        Ventas totales brutas: $${formatCLP(ventasBrutasTotales)}<br>
+        Ventas totales netas: $${formatCLP(ventasNetasTotales)}
+      `;
+    }
 
-<div class="col">
-  <h3>Resultados</h3>
-  <div id="resultados"></div>
-</div>
+    // Escuchar cambios en todos los campos
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calcularVentas);
+    });
 
-<script>
-const mesesNombres = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-const estacionalidad = [84, 50, 92, 94, 84, 95, 99, 100, 60, 98, 92, 93];
-let mesesDiv = document.getElementById("meses");
-
-mesesNombres.forEach((mes, i) => {
-  let input = document.createElement("input");
-  input.type = "number";
-  input.id = "mes" + i;
-  input.value = estacionalidad[i];
-  input.style.marginRight = "10px";
-  input.addEventListener("input", calcular);
-  mesesDiv.appendChild(document.createTextNode(mes + ": "));
-  mesesDiv.appendChild(input);
-});
-
-["ventasBase", "inversion", "insumos", "remuneraciones", "dieta", "arriendoFijo", "servicios"].forEach(id =>
-  document.getElementById(id).addEventListener("input", calcular)
-);
-
-function formatear(valor) {
-  return valor.toLocaleString('es-CL');
-}
-
-function calcular() {
-  const millonesVentas = parseFloat(document.getElementById("ventasBase").value) || 0;
-  const ventasIVA = millonesVentas * 1_000_000;
-  const millonesInversion = parseFloat(document.getElementById("inversion").value) || 0;
-  const inversion = millonesInversion * 1_000_000;
-  const neto = ventasIVA / 1.19;
-
-  document.getElementById("ventasIVA").textContent = formatear(ventasIVA);
-  document.getElementById("netoMostrar").textContent = formatear(neto);
-  document.getElementById("inversionMonto").textContent = formatear(inversion);
-
-  const p_insumos = parseFloat(document.getElementById("insumos").value) / 100;
-  const p_rem = parseFloat(document.getElementById("remuneraciones").value) / 100;
-  const p_dieta = parseFloat(document.getElementById("dieta").value) / 100;
-  const p_serv = parseFloat(document.getElementById("servicios").value) / 100;
-
-  const g_insumos = neto * p_insumos;
-  const g_rem = neto * p_rem;
-  const g_dieta = neto * p_dieta;
-  const g_serv = neto * p_serv;
-
-  const millonesArriendo = parseFloat(document.getElementById("arriendoFijo").value) || 0;
-  const g_arriendo = millonesArriendo * 1_000_000;
-  const porc_arriendo = (g_arriendo / neto) * 100;
-
-  document.getElementById("gastoInsumos").textContent = formatear(g_insumos);
-  document.getElementById("gastoRem").textContent = formatear(g_rem);
-  document.getElementById("gastoDieta").textContent = formatear(g_dieta);
-  document.getElementById("gastoServicios").textContent = formatear(g_serv);
-  document.getElementById("gastoArriendo").textContent = formatear(g_arriendo);
-  document.getElementById("porcArriendo").textContent = porc_arriendo.toFixed(2);
-
-  const gastos = g_insumos + g_rem + g_dieta + g_arriendo + g_serv;
-  const flujoMensual = neto - gastos;
-
-  let totalAnual = 0;
-  let tabla = `<table><tr><th>Mes</th><th>%</th><th>Flujo</th></tr>`;
-  for (let i = 0; i < 12; i++) {
-    let est = parseFloat(document.getElementById("mes" + i).value) / 100;
-    let flujoMes = flujoMensual * est;
-    totalAnual += flujoMes;
-    tabla += `<tr><td>${mesesNombres[i]}</td><td>${(est*100).toFixed(1)}%</td><td>$${formatear(flujoMes.toFixed(0))}</td></tr>`;
-  }
-  tabla += "</table>";
-
-  const ROI = (totalAnual / inversion) * 100;
-  const paybackMeses = inversion / flujoMensual;
-
-  document.getElementById("resultados").innerHTML = `
-    <p><strong>Flujo mensual promedio:</strong> $${formatear(flujoMensual.toFixed(0))}</p>
-    ${tabla}
-    <p><strong>Flujo anual ajustado:</strong> $${formatear(totalAnual.toFixed(0))}</p>
-    <p><strong>Retorno sobre inversión (ROI):</strong> ${ROI.toFixed(2)}%</p>
-    <p><strong>Payback (meses):</strong> ${paybackMeses.toFixed(1)}</p>
-  `;
-}
-
-window.addEventListener("DOMContentLoaded", calcular);
-</script>
-
+    // Calcular al cargar
+    window.addEventListener('DOMContentLoaded', calcularVentas);
+  </script>
 </body>
 </html>
