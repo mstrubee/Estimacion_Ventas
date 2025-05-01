@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Estimación de Ventas - Restaurante</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,9 +12,10 @@
       padding: 20px;
       background-color: #f9f9f9;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     h1 { text-align: center; color: #333; }
+    h2 { color: #333; margin-top: 30px; }
     label { display: block; margin-top: 15px; font-weight: bold; }
     input {
       width: 100%;
@@ -28,59 +30,252 @@
       border: 1px solid #b3ffb3;
       border-radius: 5px;
     }
+    canvas { margin-top: 20px; }
+    .estacionalidad {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dayBlock {
+      display: flex;
+      flex-direction: column;
+    }
+    .dayInfo {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
   <h1>Modelo de Evaluación de Ventas</h1>
   
+  <!-- Parámetros base -->
   <label for="dias">Número de días operativos:</label>
-  <input type="number" id="dias" value="21" step="any">
+  <input type="number" id="dias" value="30" step="any">
 
   <label for="comensales">Número de comensales:</label>
-  <input type="number" id="comensales" value="70" step="any">
+  <input type="number" id="comensales" value="60" step="any">
 
   <label for="ticket">Ticket promedio (CLP):</label>
-  <input type="number" id="ticket" value="12000" step="any">
+  <input type="number" id="ticket" value="7500" step="any">
 
   <label for="llenados">Llenados totales por día:</label>
-  <input type="number" id="llenados" value="2" step="any">
+  <input type="number" id="llenados" value="1" step="any">
+
+  <!-- Parámetros de estacionalidad -->
+  <h2>Factores de Estacionalidad (Multiplicadores según el día)</h2>
+  <div class="estacionalidad">
+    <div class="dayBlock">
+      <label for="est_lunes">Lunes:</label>
+      <input type="number" id="est_lunes" value="0.5" step="any">
+      <div id="info_est_lunes" class="dayInfo"></div>
+    </div>
+    <div class="dayBlock">
+      <label for="est_martes">Martes:</label>
+      <input type="number" id="est_martes" value="0.6" step="any">
+      <div id="info_est_martes" class="dayInfo"></div>
+    </div>
+    <div class="dayBlock">
+      <label for="est_miercoles">Miércoles:</label>
+      <input type="number" id="est_miercoles" value="0.8" step="any">
+      <div id="info_est_miercoles" class="dayInfo"></div>
+    </div>
+    <div class="dayBlock">
+      <label for="est_jueves">Jueves:</label>
+      <input type="number" id="est_jueves" value="0.85" step="any">
+      <div id="info_est_jueves" class="dayInfo"></div>
+    </div>
+    <div class="dayBlock">
+      <label for="est_viernes">Viernes:</label>
+      <input type="number" id="est_viernes" value="0.9" step="any">
+      <div id="info_est_viernes" class="dayInfo"></div>
+    </div>
+    <div class="dayBlock">
+      <label for="est_sabado">Sábado:</label>
+      <input type="number" id="est_sabado" value="1.3" step="any">
+      <div id="info_est_sabado" class="dayInfo"></div>
+    </div>
+    <div class="dayBlock">
+      <label for="est_domingo">Domingo:</label>
+      <input type="number" id="est_domingo" value="1.1" step="any">
+      <div id="info_est_domingo" class="dayInfo"></div>
+    </div>
+  </div>
+  
+  <!-- Resumen Semanal y Mensual -->
+  <div class="result" id="resumen_periodos"></div>
 
   <div class="result" id="resultados"></div>
 
+  <canvas id="ventasChart"></canvas>
+
   <script>
+    // Función para formatear números a CLP (sin decimales)
     function formatCLP(value) {
       return value.toLocaleString('es-CL', { maximumFractionDigits: 0 });
     }
+    
+    // Función auxiliar para convertir a número y usar 1 solo si no es un número
+    function safeParseFloat(value) {
+      const num = parseFloat(value);
+      return isNaN(num) ? 1 : num;
+    }
 
     function calcularVentas() {
+      // Parámetros base
       const dias = parseFloat(document.getElementById('dias').value) || 0;
       const comensales = parseFloat(document.getElementById('comensales').value) || 0;
       const ticket = parseFloat(document.getElementById('ticket').value) || 0;
       const llenados = parseFloat(document.getElementById('llenados').value) || 0;
 
-      const comensalesDia = comensales * llenados;
-      const ventasBrutasDia = comensalesDia * ticket;
-      const ventasNetasDia = ventasBrutasDia / 1.19;
+      // Bases de cálculo
+      const baseComensales = comensales * llenados;
+      const baseVentasBrutas = baseComensales * ticket;  // Ventas sin aplicar factor ni IVA
 
-      const ventasBrutasTotales = ventasBrutasDia * dias;
-      const ventasNetasTotales = ventasNetasDia * dias;
+      // Recopilación de factores de estacionalidad (de lunes a domingo)
+      const estacionalidad = [
+        safeParseFloat(document.getElementById('est_lunes').value),
+        safeParseFloat(document.getElementById('est_martes').value),
+        safeParseFloat(document.getElementById('est_miercoles').value),
+        safeParseFloat(document.getElementById('est_jueves').value),
+        safeParseFloat(document.getElementById('est_viernes').value),
+        safeParseFloat(document.getElementById('est_sabado').value),
+        safeParseFloat(document.getElementById('est_domingo').value)
+      ];
+      
+      // Actualización de la información debajo de cada input de estacionalidad.
+      const diaNames = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
+      diaNames.forEach((dia, index) => {
+        const factor = estacionalidad[index];
+        const infoElem = document.getElementById('info_est_' + dia);
+        if (factor === 0) {
+          infoElem.innerText = "CERRADO";
+        } else {
+          const comensalesDia = baseComensales * factor;
+          // Se calcula la venta neta dividiendo las ventas brutas por 1.19
+          const ventasNetasDia = (baseVentasBrutas * factor) / 1.19;
+          infoElem.innerText = `Comensales: ${comensalesDia.toFixed(0)} - Ventas Netas: $${formatCLP(ventasNetasDia)}`;
+        }
+      });
 
+      // Cálculo total (para los días operativos ingresados)
+      const sumaSemanal = estacionalidad.reduce((a, b) => a + b, 0);
+      const semanas = Math.floor(dias / 7);
+      const resto = dias % 7;
+      let totalBrutas = semanas * (baseVentasBrutas * sumaSemanal);
+      for (let i = 0; i < resto; i++){
+        totalBrutas += baseVentasBrutas * estacionalidad[i];
+      }
+      const totalNetas = totalBrutas / 1.19;
+      const promedioBrutas = dias ? totalBrutas / dias : 0;
+      const promedioNetas = dias ? totalNetas / dias : 0;
+
+      // Actualizar resultados para el período ingresado
       document.getElementById('resultados').innerHTML = `
-        <strong>Resultados:</strong><br>
-        Comensales diarios: ${formatCLP(comensalesDia)}<br>
-        Ventas diarias brutas: $${formatCLP(ventasBrutasDia)}<br>
-        Ventas diarias netas: $${formatCLP(ventasNetasDia)}<br><br>
-        Ventas totales brutas: $${formatCLP(ventasBrutasTotales)}<br>
-        Ventas totales netas: $${formatCLP(ventasNetasTotales)}
+        <strong>Resultados (para ${dias} días operativos):</strong><br>
+        Base de ventas diarias (sin factor estacional): $${formatCLP(baseVentasBrutas)}<br><br>
+        Ventas brutas totales: $${formatCLP(totalBrutas)}<br>
+        Ventas netas totales: $${formatCLP(totalNetas)}<br><br>
+        Promedio diario - Ventas brutas: $${formatCLP(promedioBrutas)} / Ventas netas: $${formatCLP(promedioNetas)}
       `;
+
+      // Cálculo de resumen SEMANAL (7 días)
+      const weeklyComensales = baseComensales * sumaSemanal;
+      const weeklyVentasBrutas = baseVentasBrutas * sumaSemanal;
+      const weeklyVentasNetas = weeklyVentasBrutas / 1.19;
+
+      // Cálculo de resumen MENSUAL (30 días)
+      const diasMes = 30;
+      const semanasCompletas = Math.floor(diasMes / 7); // 4
+      const diasRestantes = diasMes % 7;               // 2
+      let sumaRestante = 0;
+      for (let i = 0; i < diasRestantes; i++) {
+        sumaRestante += estacionalidad[i];
+      }
+      const monthlyFactor = semanasCompletas * sumaSemanal + sumaRestante;
+      const monthlyComensales = baseComensales * monthlyFactor;
+      const monthlyVentasBrutas = baseVentasBrutas * monthlyFactor;
+      const monthlyVentasNetas = monthlyVentasBrutas / 1.19;
+
+      // Actualizar la sección de resumen semanal y mensual
+      document.getElementById('resumen_periodos').innerHTML = `
+        <strong>Resumen Semanal (7 días):</strong><br>
+        Comensales Semanales: ${weeklyComensales.toLocaleString('es-CL', {maximumFractionDigits: 0})}<br>
+        Ventas Brutas Semanales: $${formatCLP(weeklyVentasBrutas)}<br>
+        Ventas Netas Semanales: $${formatCLP(weeklyVentasNetas)}<br><br>
+        <strong>Resumen Mensual (30 días):</strong><br>
+        Comensales Mensuales: ${monthlyComensales.toLocaleString('es-CL', {maximumFractionDigits: 0})}<br>
+        Ventas Brutas Mensuales: $${formatCLP(monthlyVentasBrutas)}<br>
+        Ventas Netas Mensuales: $${formatCLP(monthlyVentasNetas)}
+      `;
+
+      // Actualizar gráfico de barras (se muestra Ventas Netas para cada día)
+      actualizarGrafico(baseVentasBrutas, estacionalidad);
     }
 
-    // Escuchar cambios en todos los campos
+    function actualizarGrafico(ventasBase, estacionalidad) {
+      const ctx = document.getElementById('ventasChart').getContext('2d');
+      
+      // Destruir instancia previa, si existe.
+      if (window.chartInstance) {
+        window.chartInstance.destroy();
+      }
+      
+      const labels = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+      // Se calculan las Ventas Netas para cada día
+      const datosNetas = estacionalidad.map(factor => (ventasBase * factor) / 1.19);
+
+      window.chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Ventas Netas',
+              data: datosNetas,
+              backgroundColor: '#4CAF50'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const index = context.dataIndex;
+                  const factor = estacionalidad[index];
+                  const valor = context.parsed.y;
+                  if (factor === 0) {
+                    return "CERRADO";
+                  } else {
+                    const valorEnMillones = (valor / 1000000).toFixed(2);
+                    return valorEnMillones + " M";
+                  }
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString('es-CL', { maximumFractionDigits: 0 });
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Escuchar cambios en todos los inputs para recalcular
     document.querySelectorAll('input').forEach(input => {
       input.addEventListener('input', calcularVentas);
     });
 
-    // Calcular al cargar
     window.addEventListener('DOMContentLoaded', calcularVentas);
   </script>
 </body>
