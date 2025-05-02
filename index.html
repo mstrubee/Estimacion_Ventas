@@ -49,7 +49,7 @@
         font-size: 0.9rem;
       }
       input.form-control {
-        font-size: 1rem;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -78,39 +78,39 @@
   <div class="container-fluid px-3">
     <h1 class="text-center mb-3">Modelo de Evaluación de Ventas</h1>
     
-    <!-- Parámetros Base -->
+    <!-- Parámetros Base en dos columnas -->
     <div class="card">
       <div class="card-body">
         <div class="row g-2">
           <div class="col-6">
             <label for="dias" class="form-label">Días operativos:</label>
-            <input type="number" id="dias" value="30" step="any" class="form-control">
+            <input type="number" id="dias" value="30" step="any" class="form-control form-control-sm">
           </div>
           <div class="col-6">
             <label for="comensales" class="form-label">Comensales:</label>
-            <input type="number" id="comensales" value="60" step="any" class="form-control">
+            <input type="number" id="comensales" value="60" step="any" class="form-control form-control-sm">
           </div>
           <div class="col-6">
             <label for="ticket" class="form-label">Ticket (CLP):</label>
-            <input type="number" id="ticket" value="7500" step="any" class="form-control">
+            <input type="number" id="ticket" value="7500" step="any" class="form-control form-control-sm">
           </div>
           <div class="col-6">
             <label for="llenados" class="form-label">Llenados/día:</label>
-            <input type="number" id="llenados" value="1" step="any" class="form-control">
+            <input type="number" id="llenados" value="1" step="any" class="form-control form-control-sm">
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Estacionalidad -->
+    <!-- Estacionalidad en dos columnas -->
     <h2 class="mb-3">Estacionalidad</h2>
     <div class="row row-cols-2 g-2">
-      <!-- Tarjetas para cada día -->
+      <!-- Cada tarjeta para cada día con inputs pequeños -->
       <div class="col">
         <div class="card">
           <div class="card-body">
             <label for="est_lunes" class="form-label">Lunes:</label>
-            <input type="number" id="est_lunes" value="0.5" step="any" class="form-control">
+            <input type="number" id="est_lunes" value="0.5" step="any" class="form-control form-control-sm">
             <div id="info_est_lunes" class="mt-2"></div>
           </div>
         </div>
@@ -119,7 +119,7 @@
         <div class="card">
           <div class="card-body">
             <label for="est_martes" class="form-label">Martes:</label>
-            <input type="number" id="est_martes" value="0.6" step="any" class="form-control">
+            <input type="number" id="est_martes" value="0.6" step="any" class="form-control form-control-sm">
             <div id="info_est_martes" class="mt-2"></div>
           </div>
         </div>
@@ -128,7 +128,7 @@
         <div class="card">
           <div class="card-body">
             <label for="est_miercoles" class="form-label">Miércoles:</label>
-            <input type="number" id="est_miercoles" value="0.8" step="any" class="form-control">
+            <input type="number" id="est_miercoles" value="0.8" step="any" class="form-control form-control-sm">
             <div id="info_est_miercoles" class="mt-2"></div>
           </div>
         </div>
@@ -137,7 +137,7 @@
         <div class="card">
           <div class="card-body">
             <label for="est_jueves" class="form-label">Jueves:</label>
-            <input type="number" id="est_jueves" value="0.85" step="any" class="form-control">
+            <input type="number" id="est_jueves" value="0.85" step="any" class="form-control form-control-sm">
             <div id="info_est_jueves" class="mt-2"></div>
           </div>
         </div>
@@ -146,7 +146,7 @@
         <div class="card">
           <div class="card-body">
             <label for="est_viernes" class="form-label">Viernes:</label>
-            <input type="number" id="est_viernes" value="0.9" step="any" class="form-control">
+            <input type="number" id="est_viernes" value="0.9" step="any" class="form-control form-control-sm">
             <div id="info_est_viernes" class="mt-2"></div>
           </div>
         </div>
@@ -155,7 +155,7 @@
         <div class="card">
           <div class="card-body">
             <label for="est_sabado" class="form-label">Sábado:</label>
-            <input type="number" id="est_sabado" value="1.3" step="any" class="form-control">
+            <input type="number" id="est_sabado" value="1.3" step="any" class="form-control form-control-sm">
             <div id="info_est_sabado" class="mt-2"></div>
           </div>
         </div>
@@ -164,7 +164,7 @@
         <div class="card">
           <div class="card-body">
             <label for="est_domingo" class="form-label">Domingo:</label>
-            <input type="number" id="est_domingo" value="1.1" step="any" class="form-control">
+            <input type="number" id="est_domingo" value="1.1" step="any" class="form-control form-control-sm">
             <div id="info_est_domingo" class="mt-2"></div>
           </div>
         </div>
@@ -187,7 +187,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
   <script>
-    // Función para formatear números a formato CLP sin decimales
+    // Formateo de números a formato CLP sin decimales
     function formatCLP(value) {
       return value.toLocaleString('es-CL', { maximumFractionDigits: 0 });
     }
@@ -207,7 +207,7 @@
   
       // Bases de cálculo
       const baseComensales = comensales * llenados;
-      const baseVentasBrutas = baseComensales * ticket;  // Ventas sin aplicar factor ni IVA
+      const baseVentasBrutas = baseComensales * ticket;
   
       // Factores de estacionalidad (de lunes a domingo)
       const estacionalidad = [
@@ -220,7 +220,7 @@
         safeParseFloat(document.getElementById('est_domingo').value)
       ];
       
-      // Actualización de información en cada día
+      // Actualizar información en cada día
       const diaNames = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
       diaNames.forEach((dia, index) => {
         const factor = estacionalidad[index];
@@ -234,7 +234,7 @@
         }
       });
   
-      // Cálculos generales (para "dias" operativos)
+      // Cálculos generales para "dias" operativos
       const sumaSemanal = estacionalidad.reduce((a, b) => a + b, 0);
       const semanas = Math.floor(dias / 7);
       const resto = dias % 7;
@@ -246,7 +246,7 @@
       const promedioBrutas = dias ? totalBrutas / dias : 0;
       const promedioNetas = dias ? totalNetas / dias : 0;
   
-      // Actualizar resultados generales
+      // Resultados generales
       document.getElementById('resultados').innerHTML = `
         <strong>Resultados (para ${dias} días operativos):</strong><br>
         Base de ventas diarias (sin factor estacional): $${formatCLP(baseVentasBrutas)}<br><br>
