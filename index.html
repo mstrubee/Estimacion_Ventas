@@ -69,6 +69,7 @@
           <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Acerca</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="exportarPDF()">Exportar PDF</a></li>
         </ul>
       </div>
     </div>
@@ -343,5 +344,53 @@
     
     window.addEventListener('DOMContentLoaded', calcularVentas);
   </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  async function exportarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 10;
+
+    function agregarTexto(titulo, contenido) {
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text(titulo, 10, y);
+      y += 7;
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      const lineas = doc.splitTextToSize(contenido, 180);
+      doc.text(lineas, 10, y);
+      y += lineas.length * 6 + 4;
+    }
+
+    const resumen = document.getElementById('resumen_periodos').innerText;
+    const resultados = document.getElementById('resultados').innerText;
+
+    const dias = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
+    let detallesDias = "";
+    dias.forEach(dia => {
+      const info = document.getElementById("info_est_" + dia);
+      if (info && info.innerText.trim() !== "") {
+        detallesDias += `${dia.charAt(0).toUpperCase() + dia.slice(1)}: ${info.innerText.trim()}\n`;
+      }
+    });
+
+    agregarTexto("Detalle Diario de Estacionalidad", detallesDias.trim());
+    agregarTexto("Resultados Generales", resultados);
+    agregarTexto("Resumen Semanal y Mensual", resumen);
+
+    // Agregar gráfico al final de la primera hoja (posición fija)
+    const canvas = document.getElementById('ventasChart');
+    if (canvas) {
+      const imgData = canvas.toDataURL('image/png');
+      doc.addImage(imgData, 'PNG', 15, 200, 180, 90); // posición fija
+    }
+
+    doc.save("evaluacion_ventas.pdf");
+  }
+</script>
+
 </body>
 </html>
