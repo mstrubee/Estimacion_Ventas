@@ -389,6 +389,37 @@
     doc.save("evaluacion_ventas.pdf");
   }
 </script>
+<script>
+  function guardarConfiguracion() {
+    const inputs = document.querySelectorAll('input');
+    const valores = {};
+
+    inputs.forEach(input => {
+      valores[input.id] = input.value;
+    });
+
+    localStorage.setItem('configVentas', JSON.stringify(valores));
+    alert('Configuración guardada correctamente.');
+  }
+
+  function cargarConfiguracion() {
+    const guardado = localStorage.getItem('configVentas');
+    if (guardado) {
+      const valores = JSON.parse(guardado);
+      for (const id in valores) {
+        const input = document.getElementById(id);
+        if (input) {
+          input.value = valores[id];
+        }
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    cargarConfiguracion();
+    calcularVentas(); // ya definida previamente
+  });
+</script>
 
 </body>
 </html>
