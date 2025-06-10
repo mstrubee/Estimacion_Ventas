@@ -1,15 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <!-- Meta viewport para dispositivos móviles -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VentasApp - Móvil</title>
-  <!-- Bootstrap CSS CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<!-- Meta viewport para dispositivos móviles -->
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>VentasApp - Móvil</title>
+<!-- Bootstrap CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
     body {
       background-color: #f5f8fa;
       padding-bottom: 20px;
@@ -55,137 +56,134 @@
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg mb-3">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">VentasApp</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-              data-bs-target="#navbarNav" aria-controls="navbarNav" 
-              aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#" onclick="guardarConfiguracion()">Guardar</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" onclick="exportarPDF()">Exportar PDF</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  
-  <!-- Contenedor principal -->
-  <div class="container-fluid px-3">
-    <h1 class="text-center mb-3">Modelo de Evaluación de Ventas</h1>
-    
-    <!-- Parámetros Base en dos columnas -->
-    <div class="card">
-      <div class="card-body">
-        <div class="row g-2">
-          <div class="col-6">
-            <label for="dias" class="form-label">Días operativos:</label>
-            <input type="number" id="dias" value="28" step="any" class="form-control form-control-sm">
-          </div>
-          <div class="col-6">
-            <label for="comensales" class="form-label">Comensales:</label>
-            <input type="number" id="comensales" value="200" step="any" class="form-control form-control-sm">
-          </div>
-          <div class="col-6">
-            <label for="ticket" class="form-label">Ticket Bruto (CLP):</label>
-            <input type="number" id="ticket" value="5990" step="any" class="form-control form-control-sm">
-          </div>
-          <div class="col-6">
-            <label for="llenados" class="form-label">Llenados/día:</label>
-            <input type="number" id="llenados" value="1" step="any" class="form-control form-control-sm">
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Estacionalidad en dos columnas -->
-    <h2 class="mb-3">Estacionalidad</h2>
-    <div class="row row-cols-2 g-2">
-      <!-- Cada tarjeta para cada día con inputs pequeños -->
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_lunes" class="form-label">Lunes:</label>
-            <input type="number" id="est_lunes" value="1" step="any" class="form-control form-control-sm">
-            <div id="info_est_lunes" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_martes" class="form-label">Martes:</label>
-            <input type="number" id="est_martes" value="1" step="any" class="form-control form-control-sm">
-            <div id="info_est_martes" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_miercoles" class="form-label">Miércoles:</label>
-            <input type="number" id="est_miercoles" value="1" step="any" class="form-control form-control-sm">
-            <div id="info_est_miercoles" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_jueves" class="form-label">Jueves:</label>
-            <input type="number" id="est_jueves" value="1" step="any" class="form-control form-control-sm">
-            <div id="info_est_jueves" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_viernes" class="form-label">Viernes:</label>
-            <input type="number" id="est_viernes" value="1" step="any" class="form-control form-control-sm">
-            <div id="info_est_viernes" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_sabado" class="form-label">Sábado:</label>
-            <input type="number" id="est_sabado" value="0.4" step="any" class="form-control form-control-sm">
-            <div id="info_est_sabado" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <label for="est_domingo" class="form-label">Domingo:</label>
-            <input type="number" id="est_domingo" value="0" step="any" class="form-control form-control-sm">
-            <div id="info_est_domingo" class="mt-2"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Resumen Semanal y Mensual -->
-    <div id="resumen_periodos" class="result mb-3"></div>
-    
-    <!-- Resultados Generales -->
-    <div id="resultados" class="result mb-3"></div>
-    
-    <!-- Gráfico -->
-    <div class="chart-container">
-      <canvas id="ventasChart"></canvas>
-    </div>
-  </div>
-  
-  <!-- Bootstrap JS Bundle (con Popper) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <script>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg mb-3">
+<div class="container-fluid">
+<a class="navbar-brand" href="#">VentasApp</a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link" href="#" onclick="guardarConfiguracion()">Guardar</a></li>
+<li class="nav-item"><a class="nav-link" href="#" onclick="exportarPDF()">Exportar PDF</a></li>
+</ul>
+</div>
+</div>
+</nav>
+<div class="container mb-3">
+<h5>Historial de Configuraciones</h5>
+<div class="list-group mb-2" id="historial_configuraciones"></div>
+<button class="btn btn-sm btn-danger me-2" onclick="eliminarSeleccionados()">Eliminar seleccionados</button>
+<button class="btn btn-sm btn-secondary" onclick="eliminarTodo()">Borrar todo el historial</button>
+</div>
+
+<!-- Contenedor principal -->
+<div class="container-fluid px-3">
+<h1 class="text-center mb-3">Modelo de Evaluación de Ventas</h1>
+<!-- Parámetros Base en dos columnas -->
+<div class="card">
+<div class="card-body">
+<div class="row g-2">
+<div class="col-6">
+<label class="form-label" for="dias">Días operativos:</label>
+<input class="form-control form-control-sm" id="dias" step="any" type="number" value="28"/>
+</div>
+<div class="col-6">
+<label class="form-label" for="comensales">Comensales:</label>
+<input class="form-control form-control-sm" id="comensales" step="any" type="number" value="200"/>
+</div>
+<div class="col-6">
+<label class="form-label" for="ticket">Ticket Bruto (CLP):</label>
+<input class="form-control form-control-sm" id="ticket" step="any" type="number" value="5990"/>
+</div>
+<div class="col-6">
+<label class="form-label" for="llenados">Llenados/día:</label>
+<input class="form-control form-control-sm" id="llenados" step="any" type="number" value="1"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Estacionalidad en dos columnas -->
+<h2 class="mb-3">Estacionalidad</h2>
+<div class="row row-cols-2 g-2">
+<!-- Cada tarjeta para cada día con inputs pequeños -->
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_lunes">Lunes:</label>
+<input class="form-control form-control-sm" id="est_lunes" step="any" type="number" value="1"/>
+<div class="mt-2" id="info_est_lunes"></div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_martes">Martes:</label>
+<input class="form-control form-control-sm" id="est_martes" step="any" type="number" value="1"/>
+<div class="mt-2" id="info_est_martes"></div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_miercoles">Miércoles:</label>
+<input class="form-control form-control-sm" id="est_miercoles" step="any" type="number" value="1"/>
+<div class="mt-2" id="info_est_miercoles"></div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_jueves">Jueves:</label>
+<input class="form-control form-control-sm" id="est_jueves" step="any" type="number" value="1"/>
+<div class="mt-2" id="info_est_jueves"></div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_viernes">Viernes:</label>
+<input class="form-control form-control-sm" id="est_viernes" step="any" type="number" value="1"/>
+<div class="mt-2" id="info_est_viernes"></div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_sabado">Sábado:</label>
+<input class="form-control form-control-sm" id="est_sabado" step="any" type="number" value="0.4"/>
+<div class="mt-2" id="info_est_sabado"></div>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card">
+<div class="card-body">
+<label class="form-label" for="est_domingo">Domingo:</label>
+<input class="form-control form-control-sm" id="est_domingo" step="any" type="number" value="0"/>
+<div class="mt-2" id="info_est_domingo"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Resumen Semanal y Mensual -->
+<div class="result mb-3" id="resumen_periodos"></div>
+<!-- Resultados Generales -->
+<div class="result mb-3" id="resultados"></div>
+<!-- Gráfico -->
+<div class="chart-container">
+<canvas id="ventasChart"></canvas>
+</div>
+</div>
+<!-- Bootstrap JS Bundle (con Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
     // Formateo de números a formato CLP sin decimales
     function formatCLP(value) {
       return value.toLocaleString('es-CL', { maximumFractionDigits: 0 });
@@ -342,7 +340,6 @@
     
     window.addEventListener('DOMContentLoaded', calcularVentas);
   </script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   async function exportarPDF() {
@@ -390,36 +387,135 @@
   }
 </script>
 <script>
-  function guardarConfiguracion() {
-    const inputs = document.querySelectorAll('input');
-    const valores = {};
+function guardarConfiguracion() {
+  const inputs = document.querySelectorAll('input');
+  const valores = {};
+  inputs.forEach(input => {
+    valores[input.id] = input.value;
+  });
+  localStorage.setItem('configVentas', JSON.stringify(valores));
+  alert('Configuración guardada correctamente.');
+}
 
-    inputs.forEach(input => {
-      valores[input.id] = input.value;
-    });
-
-    localStorage.setItem('configVentas', JSON.stringify(valores));
-    alert('Configuración guardada correctamente.');
-  }
-
-  function cargarConfiguracion() {
-    const guardado = localStorage.getItem('configVentas');
-    if (guardado) {
-      const valores = JSON.parse(guardado);
-      for (const id in valores) {
-        const input = document.getElementById(id);
-        if (input) {
-          input.value = valores[id];
-        }
+function cargarConfiguracion() {
+  const guardado = localStorage.getItem('configVentas');
+  if (guardado) {
+    const valores = JSON.parse(guardado);
+    for (const id in valores) {
+      const input = document.getElementById(id);
+      if (input) {
+        input.value = valores[id];
       }
     }
   }
+}
 
-  document.addEventListener('DOMContentLoaded', () => {
-    cargarConfiguracion();
-    calcularVentas(); // ya definida previamente
+document.addEventListener('DOMContentLoaded', () => {
+  cargarConfiguracion();
+  calcularVentas();
+});
+</script><script>
+function guardarConfiguracion() {
+  const nombre = prompt("Ingresa un nombre para esta configuración:");
+  if (!nombre) return;
+
+  const inputs = document.querySelectorAll('input');
+  const valores = {};
+  inputs.forEach(input => {
+    valores[input.id] = input.value;
   });
-</script>
+
+  let historial = JSON.parse(localStorage.getItem("historialConfigVentas") || "{}");
+  historial[nombre] = valores;
+  localStorage.setItem("historialConfigVentas", JSON.stringify(historial));
+  alert("Configuración guardada como: " + nombre);
+  actualizarHistorial();
+}
+
+function cargarConfiguracionPorNombre(nombre) {
+  const historial = JSON.parse(localStorage.getItem("historialConfigVentas") || "{}");
+  const valores = historial[nombre];
+  if (!valores) return;
+
+  for (const id in valores) {
+    const input = document.getElementById(id);
+    if (input) {
+      input.value = valores[id];
+    }
+  }
+  calcularVentas();
+}
+
+function eliminarConfiguracion(nombre) {
+  let historial = JSON.parse(localStorage.getItem("historialConfigVentas") || "{}");
+  delete historial[nombre];
+  localStorage.setItem("historialConfigVentas", JSON.stringify(historial));
+  actualizarHistorial();
+}
+
+function eliminarSeleccionados() {
+  const checks = document.querySelectorAll('.historial-checkbox:checked');
+  let historial = JSON.parse(localStorage.getItem("historialConfigVentas") || "{}");
+  checks.forEach(checkbox => {
+    delete historial[checkbox.value];
+  });
+  localStorage.setItem("historialConfigVentas", JSON.stringify(historial));
+  actualizarHistorial();
+}
+
+function eliminarTodo() {
+  if (confirm("¿Estás seguro de que deseas borrar todo el historial?")) {
+    localStorage.removeItem("historialConfigVentas");
+    actualizarHistorial();
+  }
+}
+
+function actualizarHistorial() {
+  const contenedor = document.getElementById("historial_configuraciones");
+  contenedor.innerHTML = "";
+
+  const historial = JSON.parse(localStorage.getItem("historialConfigVentas") || "{}");
+  for (const nombre in historial) {
+    const div = document.createElement("div");
+    div.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    const label = document.createElement("span");
+    label.textContent = nombre;
+
+    const controls = document.createElement("div");
+    controls.className = "d-flex gap-2";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "form-check-input historial-checkbox";
+    checkbox.value = nombre;
+
+    const btnCargar = document.createElement("button");
+    btnCargar.textContent = "Cargar";
+    btnCargar.className = "btn btn-sm btn-success";
+    btnCargar.onclick = () => cargarConfiguracionPorNombre(nombre);
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "Eliminar";
+    btnEliminar.className = "btn btn-sm btn-outline-danger";
+    btnEliminar.onclick = () => eliminarConfiguracion(nombre);
+
+    controls.appendChild(checkbox);
+    controls.appendChild(btnCargar);
+    controls.appendChild(btnEliminar);
+
+    div.appendChild(label);
+    div.appendChild(controls);
+
+    contenedor.appendChild(div);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  actualizarHistorial();
+});
+</script></body>
+</html>
 
 </body>
 </html>
